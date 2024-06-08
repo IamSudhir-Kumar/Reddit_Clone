@@ -1,12 +1,9 @@
-import * as THREE from "three";
+import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-// import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-
 import fragment from "./shader/fragment.glsl";
 import vertex from "./shader/vertex.glsl";
-import * as dat from "dat.gui";
+import * as dat from "lil-gui";
 import gsap from "gsap";
-
 
 export default class Sketch {
   constructor(options) {
@@ -16,22 +13,19 @@ export default class Sketch {
     this.width = this.container.offsetWidth;
     this.height = this.container.offsetHeight;
     this.renderer = new THREE.WebGLRenderer();
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setSize(this.width, this.height);
-    this.renderer.setClearColor(0xeeeeee, 1); 
+    this.renderer.setClearColor(0x000000, 1); 
 
     this.container.appendChild(this.renderer.domElement);
 
     this.camera = new THREE.PerspectiveCamera(
       70,
-      window.innerWidth / window.innerHeight,
+      this.width / this.height,
       0.001,
       1000
     );
 
-    // var frustumSize = 10;
-    // var aspect = window.innerWidth / window.innerHeight;
-    // this.camera = new THREE.OrthographicCamera( frustumSize * aspect / - 2, frustumSize * aspect / 2, frustumSize / 2, frustumSize / - 2, -1000, 1000 );
     this.camera.position.set(0, 0, 2);
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.time = 0;
@@ -42,11 +36,9 @@ export default class Sketch {
     this.resize();
     this.render();
     this.setupResize();
-    // this.settings();
   }
 
   settings() {
-    let that = this;
     this.settings = {
       progress: 0,
     };
@@ -67,7 +59,20 @@ export default class Sketch {
   }
 
   addObjects() {
-    let that = this;
+    const count = 10000;
+    let baseGeometry = new THREE.PlaneGeometry(1, 1);
+    let geometry = new THREE.InstancedBufferGeometry().copy(baseGeometry);
+    geometry.instanceCount = count;
+
+    let positions = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+     let x = (Math.random() - 0.5)*0.5;
+      let y = (Math.random() - 0.5)*0.5;
+      let z = (Math.random() - 0.5)*0.5;
+      positions.set([x, y, z], i * 3);
+    }
+    geometry.setAttribute('offset', new THREE.InstancedBufferAttribute(positions, 3, false));
+
     this.material = new THREE.ShaderMaterial({
       extensions: {
         derivatives: "#extension GL_OES_standard_derivatives : enable"
@@ -77,27 +82,12 @@ export default class Sketch {
         time: { value: 0 },
         resolution: { value: new THREE.Vector4() },
       },
-      // wireframe: true,
-      // transparent: true,
       vertexShader: vertex,
       fragmentShader: fragment
     });
 
-    this.geometry = new THREE.PlaneGeometry(1, 1, 1, 1);
-
-    this.plane = new THREE.Mesh(this.geometry, this.material);
-    this.scene.add(this.plane);
-  }
-
-  stop() {
-    this.isPlaying = false;
-  }
-
-  play() {
-    if(!this.isPlaying){
-      this.render()
-      this.isPlaying = true;
-    }
+    this.points = new THREE.Mesh(geometry, this.material);
+    this.scene.add(this.points);
   }
 
   render() {
