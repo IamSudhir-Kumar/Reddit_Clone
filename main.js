@@ -40,12 +40,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const light = new THREE.HemisphereLight( 0xffffff, 0xbbbbff, 1 );
     scene.add(light);
 
-    const necklace = await loadGLTF('./necklace/scene.gltf');
-    necklace.scene.scale.set(0.005, 0.005, 0.005);
+    const necklace = await loadGLTF('./models/necklace (1).glb');
+    necklace.scene.scale.set(0.2, 0.2, 0.2);
 
     // Adjust the position and orientation of the necklace
     necklace.scene.position.set(0, -0.6, 0); // Adjust these values to fit the necklace properly
-    necklace.scene.rotation.set(-0.5, 0, 0); // Tilt the necklace backwards
+    necklace.scene.rotation.set(-0.7, 0, 0); // Tilt the necklace backwards
 
     const anchor = mindarThree.addAnchor(199); // Using an anchor index closer to the neck
     anchor.group.add(necklace.scene);
