@@ -1,79 +1,148 @@
+<!DOCTYPE html>
 <html>
-  <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script src="/libs/mindar/mindar-face-three.prod.js"></script>
-    <script src="./main.js" type="module"></script>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-face-aframe.prod.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const list = ["glasses1", "glasses2", "hat1"];
+      const visibles = [false, false, false];
+      const setVisible = (button, entities, visible) => {
+        if (visible) {
+          button.classList.add("selected");
+        } else {
+          button.classList.remove("selected");
+        }
+        entities.forEach((entity) => {
+          entity.setAttribute("visible", visible);
+        });
+      };
+      list.forEach((item, index) => {
+        const button = document.querySelector("#" + item);
+        const entities = document.querySelectorAll("." + item + "-entity");
+        setVisible(button, entities, visibles[index]);
+        button.addEventListener('click', () => {
+          visibles[index] = !visibles[index];
+          setVisible(button, entities, visibles[index]);
+        });
+      });
+    });
+  </script>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
 
-    <style>
-      html,
-      body {
-        position: relative;
-        margin: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
-      }
-      #capture {
-        position: fixed;
-        bottom: 2vh;
-        left: 50%;
-        height: 12vw;
-        width: 12vw;
-        border: solid 2px;
-        border-radius: 50%;
-        transform: translateX(-50%);
-        z-index: 10;
-      }
+    .example-container {
+      overflow: hidden;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
 
-      #preview {
-        position: fixed;
-        z-index: 10;
-        left: 10%;
-        top: 10%;
-        width: 80%;
-        height: 80%;
-        border: solid 10px white;
-        visibility: hidden;
-      }
-      #preview-image {
+    .options-panel {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 25%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+      z-index: 2;
+      padding: 10px;
+      box-sizing: border-box;
+      overflow-y: auto;
+    }
+
+    .options-panel h2 {
+      margin-top: 0;
+      font-size: 20px;
+      color: #333;
+    }
+
+    .options-panel img {
+      border: solid 2px #ccc;
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      cursor: pointer;
+      margin: 5px;
+      transition: border-color 0.3s ease, transform 0.3s ease;
+    }
+
+    .options-panel img:hover {
+      border-color: #888;
+      transform: scale(1.1);
+    }
+
+    .options-panel img.selected {
+      border-color: green;
+    }
+
+    /* Media query for phone screens */
+    @media (max-width: 600px) {
+      .options-panel {
+        left: 0;
+        top: auto;
+        bottom: 0;
         width: 100%;
-        height: 100%;
-      }
-      #preview-close {
-        position: absolute;
-        right: 0;
-        top: 0;
-        font-size: 20px;
+        height: auto;
+        display: flex;
+        justify-content: center;
         padding: 5px;
-        border: solid 1px;
-        cursor: pointer;
-        color: white;
-        border: solid 5px white;
-        right: -5px;
-        top: -5px;
+        box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+        overflow-y: hidden;
+        overflow-x: auto;
       }
-      #preview-share {
-        border: solid 1px;
-        text-align: center;
-        cursor: pointer;
-        background: white;
 
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        bottom: 10px;
-        padding: 10px 30px;
-        border-radius: 10px;
-        border: none;
+      .options-panel h2 {
+        display: none;
       }
-    </style>
-  </head>
-  <body>
-    <button id="capture"></button>
-    <div id="preview">
-      <div id="preview-close">X</div>
-      <img id="preview-image" />
-      <div id="preview-share">Share</div>
+
+      .options-panel img {
+        width: 60px;
+        height: 60px;
+        margin: 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="example-container">
+    <div class="options-panel">
+      <img id="hat1" src="./necklace.png"/>
+      <img id="glasses1" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/face-tracking/assets/glasses/thumbnail.png"/>
+      <img id="glasses2" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/face-tracking/assets/glasses2/thumbnail.png"/>
     </div>
-  </body>
+    <a-scene mindar-face embedded color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+      <a-assets>
+        <a-asset-item id="headModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/face-tracking/assets/sparkar/headOccluder.glb"></a-asset-item>
+        <a-asset-item id="glassesModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/face-tracking/assets/glasses/scene.gltf"></a-asset-item>
+        <a-asset-item id="glassesModel2" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/face-tracking/assets/glasses2/scene.gltf"></a-asset-item>
+        <a-asset-item id="hatModel" src="./models/neclaceu1.glb"></a-asset-item>
+      </a-assets>
+    
+      <a-light type="directional" color="#ffffff" intensity="2" position="0 2 1"></a-light>
+      <a-light type="ambient" color="#ffffff" intensity="1"></a-light>
+    
+      <a-camera active="false" position="0 0 0"></a-camera>
+      <!-- head occluder -->
+      <a-entity mindar-face-target="anchorIndex: 168">
+        <a-gltf-model mindar-face-occluder position="0 -0.3 0.15" rotation="0 0 0" scale="0.065 0.065 0.065" src="#headModel"></a-gltf-model>
+      </a-entity>
+      <a-entity mindar-face-target="anchorIndex: 152">
+        <a-gltf-model rotation="0 180 0" position="0 -1.2 -0.5" scale="0.75 0.75 0.75" src="#hatModel" class="hat1-entity" visible="false"></a-gltf-model>
+      </a-entity>
+      <a-entity mindar-face-target="anchorIndex: 168">
+        <a-gltf-model rotation="0 0 0" position="0 -0.05 0.3" scale="0.01 0.01 0.01" src="#glassesModel" class="glasses1-entity" visible="false"></a-gltf-model>
+      </a-entity>
+      <a-entity mindar-face-target="anchorIndex: 168">
+        <a-gltf-model rotation="0 -90 0" position="0 -0.05 0.3" scale="0.6 0.6 0.6" src="#glassesModel2" class="glasses2-entity" visible="false"></a-gltf-model>
+      </a-entity>
+    </a-scene>
+    
+  </div>
+</body>
 </html>
