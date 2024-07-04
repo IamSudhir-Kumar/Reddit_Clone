@@ -6,8 +6,8 @@
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-face-aframe.prod.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
-      const list = ["glasses1", "glasses2", "hat1"];
-      const visibles = [false, false, false];
+      const list = ["glasses1", "glasses2", "necklace1", "earrings"];
+      const visibles = [false, false, false, false];
       const setVisible = (button, entities, visible) => {
         if (visible) {
           button.classList.add("selected");
@@ -27,6 +27,27 @@
           setVisible(button, entities, visibles[index]);
         });
       });
+
+      // Adjust model size for mobile screens
+      const adjustModelScale = () => {
+        const isMobile = window.innerWidth <= 600;
+        // Define different scale values for each model
+        const scales = {
+          headModel: isMobile ? "0.04 0.04 0.04" : "0.065 0.065 0.065",
+          necklaceModel: isMobile ? "0.5 0.5 0.5" : "0.75 0.75 0.75",
+          glassesModel: isMobile ? "0.008 0.008 0.008" : "0.01 0.01 0.01",
+          glassesModel2: isMobile ? "0.45 0.45 0.45" : "0.6 0.6 0.6",
+          earringModel: isMobile ? "0.05 0.05 0.05" : "0.1 0.1 0.1"
+        };
+
+        document.querySelectorAll('.scalable').forEach(model => {
+          const id = model.getAttribute('src').substring(1);
+          model.setAttribute('scale', scales[id]);
+        });
+      };
+
+      window.addEventListener('resize', adjustModelScale);
+      adjustModelScale();
     });
   </script>
   <style>
@@ -112,16 +133,18 @@
 <body>
   <div class="example-container">
     <div class="options-panel">
-      <img id="hat1" src="./necklace.png"/>
+      <img id="necklace1" src="./necklace.png"/>
       <img id="glasses1" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/face-tracking/assets/glasses/thumbnail.png"/>
       <img id="glasses2" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/face-tracking/assets/glasses2/thumbnail.png"/>
+      <img id="earrings" src="./Screenshot 2024-07-04 165944.png"/> <!-- Replace with your earring thumbnail -->
     </div>
     <a-scene mindar-face embedded color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
       <a-assets>
         <a-asset-item id="headModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/face-tracking/assets/sparkar/headOccluder.glb"></a-asset-item>
         <a-asset-item id="glassesModel" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/face-tracking/assets/glasses/scene.gltf"></a-asset-item>
         <a-asset-item id="glassesModel2" src="https://cdn.jsdelivr.net/gh/hiukim/mind-ar-js@1.2.5/examples/face-tracking/assets/glasses2/scene.gltf"></a-asset-item>
-        <a-asset-item id="hatModel" src="./models/neclaceu1.glb"></a-asset-item>
+        <a-asset-item id="necklaceModel" src="./models/neclaceu1.glb"></a-asset-item>
+        <a-asset-item id="earringModel" src="./models/e1.glb"></a-asset-item> <!-- Replace with your earring model -->
       </a-assets>
     
       <a-light type="directional" color="#ffffff" intensity="2" position="0 2 1"></a-light>
@@ -130,19 +153,25 @@
       <a-camera active="false" position="0 0 0"></a-camera>
       <!-- head occluder -->
       <a-entity mindar-face-target="anchorIndex: 168">
-        <a-gltf-model mindar-face-occluder position="0 -0.3 0.15" rotation="0 0 0" scale="0.065 0.065 0.065" src="#headModel"></a-gltf-model>
+        <a-gltf-model mindar-face-occluder position="0 -0.3 0.15" rotation="0 0 0" scale="0.065 0.065 0.065" src="#headModel" class="scalable"></a-gltf-model>
       </a-entity>
       <a-entity mindar-face-target="anchorIndex: 152">
-        <a-gltf-model rotation="0 180 0" position="0 -1.2 -0.5" scale="0.75 0.75 0.75" src="#hatModel" class="hat1-entity" visible="false"></a-gltf-model>
+        <a-gltf-model rotation="0 180 0" position="0 -1.2 -0.5" scale="0.75 0.75 0.75" src="#necklaceModel" class="necklace1-entity scalable" visible="false"></a-gltf-model>
       </a-entity>
       <a-entity mindar-face-target="anchorIndex: 168">
-        <a-gltf-model rotation="0 0 0" position="0 -0.05 0.3" scale="0.01 0.01 0.01" src="#glassesModel" class="glasses1-entity" visible="false"></a-gltf-model>
+        <a-gltf-model rotation="0 0 0" position="0 -0.05 0.3" scale="0.01 0.01 0.01" src="#glassesModel" class="glasses1-entity scalable" visible="false"></a-gltf-model>
       </a-entity>
       <a-entity mindar-face-target="anchorIndex: 168">
-        <a-gltf-model rotation="0 -90 0" position="0 -0.05 0.3" scale="0.6 0.6 0.6" src="#glassesModel2" class="glasses2-entity" visible="false"></a-gltf-model>
+        <a-gltf-model rotation="0 -90 0" position="0 -0.05 0.3" scale="0.6 0.6 0.6" src="#glassesModel2" class="glasses2-entity scalable" visible="false"></a-gltf-model>
+      </a-entity>
+      <!-- Earring entities -->
+      <a-entity mindar-face-target="anchorIndex: 43">
+        <a-gltf-model rotation="0 90 0" position="0.12 -0.6 0.2" scale="0.1 0.1 0.1" src="#earringModel" class="earrings-entity scalable" visible="false"></a-gltf-model>
+      </a-entity>
+      <a-entity mindar-face-target="anchorIndex: 276">
+        <a-gltf-model rotation="0 -90 0" position="-0.12 -0.6 0.2" scale="0.1 0.1 0.1" src="#earringModel" class="earrings-entity scalable" visible="false"></a-gltf-model>
       </a-entity>
     </a-scene>
-    
   </div>
 </body>
 </html>
